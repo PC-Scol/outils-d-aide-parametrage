@@ -1,0 +1,2023 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Outils éléments de droits & Pièces justificatives</title>
+<script src="config.js"></script>
+<style>
+  :root{
+    --primary:#4f46e5; --primary-100:#eef2ff; --border:#e5e7eb;
+    --text:#111827; --muted:#6b7280; --bg:#ffffff;
+  }
+  html,body{height:100%}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif;background:var(--bg);color:var(--text)}
+
+  .layout{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+  .sidebar{background:#fafafa;border-right:1px solid var(--border);padding:20px}
+  .brand{font-weight:700;font-size:18px;margin-bottom:14px}
+  .nav{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+  .nav .tab{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid var(--border);
+            background:#fff;cursor:pointer;transition:.2s;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+  .nav .tab:hover{border-color:#d1d5db}
+  .nav .tab.active{border-color:var(--primary);background:var(--primary-100);color:var(--primary);box-shadow:0 1px 3px rgba(79,70,229,.15)}
+  .nav .tab .dot{width:10px;height:10px;border-radius:999px;background:#d1d5db;flex:0 0 10px}
+  .nav .tab.active .dot{background:var(--primary)}
+
+  .content{padding:24px;max-width:1200px}
+  .hidden{display:none}
+
+  .card{background:#fff;border:1px solid var(--border);border-radius:16px;box-shadow:0 1px 2px rgba(0,0,0,.04);padding:20px;margin-top:20px}
+  .title{font-weight:600;font-size:18px;margin-bottom:8px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+  @media(max-width:1100px){
+    .layout{grid-template-columns:1fr}
+    .sidebar{display:none}
+    .content{padding:16px}
+    .grid2,.grid3{grid-template-columns:1fr}
+  }
+
+  label{font-size:13px;color:#374151;display:block;margin-bottom:6px}
+  input,select,textarea,button{font-family:inherit}
+  input,select,textarea{width:100%;box-sizing:border-box;border:1px solid var(--border);border-radius:12px;padding:10px;background:#fff}
+  textarea{resize:vertical}
+  input:disabled, select:disabled, textarea:disabled{background:#f3f4f6;color:#9ca3af}
+
+  .btn{border-radius:12px;padding:8px 14px;border:1px solid var(--border);background:#fff;cursor:pointer}
+  .btn.primary{background:#4f46e5;color:#fff;border-color:#4f46e5}
+  .btn.danger{color:#b91c1c;border-color:var(--border)}
+  .row{display:flex;gap:8px;align-items:center}
+  .muted{color:#6b7280;font-size:13px}
+
+  .toggle{position:relative;width:44px;height:24px;background:#e5e7eb;border-radius:9999px;cursor:pointer;transition:.2s}
+  .toggle span{position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:9999px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.1);transition:.2s}
+  .toggle.on{background:#4f46e5}
+  .toggle.on span{transform:translateX(20px)}
+
+  .badge{display:inline-flex;align-items:center;border-radius:999px;padding:2px 8px;font-size:11px;background:#f3f4f6;color:#374151}
+  .badge.green{background:#dcfce7;color:#166534}
+  .badge.red{background:#fee2e2;color:#b91c1c}
+  .badge.blue{background:#dbeafe;color:#1d4ed8}
+  .badge.gray{background:#e5e7eb;color:#374151}
+
+  .row4{display:grid;grid-template-columns:140px 120px 1fr;gap:8px}
+  @media(max-width:900px){.row4{grid-template-columns:1fr}}
+
+  .selectlike{position:relative}
+  .selectlike>button{width:100%;text-align:left;border-radius:12px;border:1px solid var(--border);background:#fff;padding:8px 10px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+  .selectlike .lbl{white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+  .selectlike .dropdown{position:absolute;z-index:20;top:100%;left:0;right:0;background:#fff;border:1px solid var(--border);border-radius:12px;margin-top:4px;max-height:220px;overflow:auto;box-shadow:0 8px 16px rgba(0,0,0,.06)}
+  .selectlike .opt{display:flex;align-items:center;gap:8px;padding:8px 12px;font-size:13px;cursor:pointer}
+  .selectlike .opt:hover{background:#f3f4f6}
+  .selectlike input[type=checkbox]{margin:0;width:auto;flex-shrink:0}
+  .selectlike .opt span{flex:1}
+
+  .mt-2{margin-top:8px}
+  .mt-4{margin-top:16px}
+
+  details.card{cursor:pointer}
+  details.card summary{list-style:none;display:flex;align-items:center;justify-content:space-between}
+  details.card summary::-webkit-details-marker{display:none}
+  details.card summary::after{content:'▼';font-size:12px;color:var(--muted);transition:transform 0.2s}
+  details.card[open] summary::after{transform:rotate(-180deg)}
+  details.card .details-content{margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">Suite d'outils</div>
+    
+    <div class="muted">Navigation</div>
+    <div class="nav" id="nav">
+      <button class="tab active" data-tab="edr"><span class="dot"></span><span>Éléments de droit</span></button>
+      <button class="tab" data-tab="tarif"><span class="dot"></span><span>Tarifications</span></button>
+      <button class="tab" data-tab="pj"><span class="dot"></span><span>Pièces justificatives</span></button>
+      <button class="tab" data-tab="options"><span class="dot"></span><span>Options</span></button>
+    </div>
+    <div class="muted" style="margin-top:14px">Astuce</div>
+    <div class="mt-2">Utilisez ↑ ↓ pour prioriser vos combinaisons.</div>
+  </aside>
+
+  <main class="content">
+    <section id="pane-edr"></section>
+    <section id="pane-tarif" class="hidden"></section>
+    <section id="pane-pj" class="hidden"></section>
+    <section id="pane-options" class="hidden"></section>
+  </main>
+</div>
+
+<script>
+(function(){
+  document.getElementById('nav').addEventListener('click', (e)=>{
+    const btn = e.target.closest('.tab'); if(!btn) return;
+    document.querySelectorAll('.nav .tab').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('main > section').forEach(s=>s.classList.add('hidden'));
+    document.getElementById('pane-'+btn.dataset.tab).classList.remove('hidden');
+  });
+
+  const uid = ()=>'id'+Math.random().toString(36).slice(2,9);
+  const el = html => { const d=document.createElement('div'); d.innerHTML=html.trim(); return d.firstChild; };
+
+  function createMulti({options, selected, onChange, placeholder='Selectionner...'}){
+    let localSelected = [...selected];
+    const root = el('<div class="selectlike"></div>');
+    const btn  = el('<button type="button"><span class="lbl">'+(localSelected.length?localSelected.join(', '):placeholder)+'</span></button>');
+    const dd   = el('<div class="dropdown hidden" role="listbox"></div>');
+    function render(){
+      dd.innerHTML = options.map(o=>'<label class="opt"><input type="checkbox" '+(localSelected.includes(o)?'checked':'')+' value="'+o+'"><span>'+o+'</span></label>').join('');
+      dd.querySelectorAll('input[type=checkbox]').forEach(c=> c.onchange = (e)=>{
+        const v=e.target.value;
+        if(e.target.checked){ if(!localSelected.includes(v)) localSelected.push(v); }
+        else { localSelected = localSelected.filter(x=>x!==v); }
+        btn.querySelector('.lbl').textContent = localSelected.length? localSelected.join(', '):placeholder;
+        onChange(localSelected.slice());
+      });
+    }
+    btn.onclick=(e)=>{ 
+      e.stopPropagation();
+      render(); 
+      dd.classList.toggle('hidden'); 
+    };
+    document.addEventListener('click', (e)=>{ if(!root.contains(e.target)) dd.classList.add('hidden'); });
+    root.append(btn,dd);
+    return {root, setSelected:(vals)=>{localSelected=[...vals];btn.querySelector('.lbl').textContent = localSelected.length?localSelected.join(', '):placeholder;}};
+  }
+
+  /* ======== GLOBAL BACKUP / RESTORE ======== */
+  async function globalBackup(){
+    const allData = {
+      version: "1.0",
+      timestamp: new Date().toISOString(),
+      data: {
+        edr: JSON.parse(localStorage.getItem(LS_EDR)||'[]'),
+        tarifs: JSON.parse(localStorage.getItem(LS_TARIF)||'[]'),
+        pj: JSON.parse(localStorage.getItem(LS_PJ)||'[]')
+      }
+    };
+    
+    const content = JSON.stringify(allData, null, 2);
+    const filename = `backup-complet-${new Date().toISOString().slice(0,10)}.json`;
+    
+    const totalItems = allData.data.edr.length + allData.data.tarifs.length + allData.data.pj.length;
+    
+    const saved = await saveFileWithPicker(content, filename);
+    
+    // Fallback to automatic download if API not supported
+    if (saved === null) {
+      alert('ℹ️ Votre navigateur ne supporte pas la sélection de dossier.\n\nLe fichier sera téléchargé dans votre dossier de téléchargements par défaut.');
+      const blob = new Blob([content], {type: "application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      alert(`✅ Backup créé avec succès !\n\n📊 Total: ${totalItems} élément(s)\n- EDR: ${allData.data.edr.length}\n- Tarifs: ${allData.data.tarifs.length}\n- PJ: ${allData.data.pj.length}`);
+    } else if (saved === true) {
+      alert(`✅ Backup enregistré avec succès !\n\n📊 Total: ${totalItems} élément(s)\n- EDR: ${allData.data.edr.length}\n- Tarifs: ${allData.data.tarifs.length}\n- PJ: ${allData.data.pj.length}`);
+    }
+    // If saved === false, user cancelled, no message needed
+  }
+  
+  function globalRestore(file){
+    if(!file) return;
+    
+    console.log('Global restore started:', {
+      fileName: file.name,
+      fileSize: file.size,
+      fileType: file.type
+    });
+    
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      console.log('Backup file loaded, size:', reader.result.length);
+      try{
+        const backup = JSON.parse(reader.result);
+        console.log('Backup parsed:', backup);
+        
+        if(!backup.data || !backup.data.edr || !backup.data.tarifs || !backup.data.pj){
+          console.error('Invalid backup format:', backup);
+          alert('❌ Format de backup invalide.\n\nLe fichier doit contenir: data.edr, data.tarifs, data.pj');
+          return;
+        }
+        
+        const totalItems = backup.data.edr.length + backup.data.tarifs.length + backup.data.pj.length;
+        console.log('Backup content:', {
+          edr: backup.data.edr.length,
+          tarifs: backup.data.tarifs.length,
+          pj: backup.data.pj.length,
+          total: totalItems
+        });
+        
+        if(!confirm(`📥 Restaurer le backup ?\n\n📊 Contenu:\n- EDR: ${backup.data.edr.length}\n- Tarifs: ${backup.data.tarifs.length}\n- PJ: ${backup.data.pj.length}\n\n⚠️ Cela remplacera toutes vos données actuelles !`)){
+          console.log('Restore cancelled by user');
+          return;
+        }
+        
+        localStorage.setItem(LS_EDR, JSON.stringify(backup.data.edr));
+        localStorage.setItem(LS_TARIF, JSON.stringify(backup.data.tarifs));
+        localStorage.setItem(LS_PJ, JSON.stringify(backup.data.pj));
+        
+        console.log('Backup restored successfully');
+        alert(`✅ Backup restauré avec succès !\n\n${totalItems} élément(s) restauré(s).`);
+        
+        // Refresh all panels
+        renderEDR();
+        renderTarif();
+        renderPJ();
+      }catch(e){
+        console.error('Restore error:', e);
+        console.error('Error details:', {
+          message: e.message,
+          stack: e.stack,
+          fileContent: reader.result?.substring(0, 200) + '...'
+        });
+        alert('❌ Erreur lors de la restauration du backup.\n\n' + e.message + '\n\nOuvrez la console (F12) pour plus de détails.');
+      }
+    };
+    reader.onerror = (e)=>{
+      console.error('File read error:', e);
+      alert('❌ Erreur lors de la lecture du fichier.\n\nLe fichier est peut-être sur un lecteur réseau bloqué par le navigateur.\n\nSolution : Copiez le fichier sur votre disque local (ex: Bureau) et réessayez.');
+    };
+    reader.readAsText(file);
+  }
+  
+  // Setup global backup/restore buttons - will be initialized at the end
+
+  /* ======== EDR ======== */
+  // ⚠️ VALEURS NON MODIFIABLES - NE PAS MODIFIER
+  // Ces valeurs sont fixes et ne doivent jamais être modifiées
+  const OPS = ["Indifférent","Parmi","Différent de"];
+  const EDR_FIXED_VALUES = {
+    inscriptionPrincipale:["Oui","Non","Aucune"],
+    ueEeeAccords:["Indifférent","Oui","Non"]
+  };
+  
+  // ✏️ VALEURS MODIFIABLES - Voir config.js
+  // Les valeurs ci-dessous proviennent du fichier config.js externe
+  const DEFAULT_EDR = {
+    regime: CONFIG_MODIFIABLE.EDR.regime,
+    inscriptionPrincipale: EDR_FIXED_VALUES.inscriptionPrincipale,
+    ueEeeAccords: EDR_FIXED_VALUES.ueEeeAccords,
+    profilsSpecifiques: CONFIG_MODIFIABLE.EDR.profilsSpecifiques,
+    boursesAides: CONFIG_MODIFIABLE.EDR.boursesAides,
+    cesure: CONFIG_MODIFIABLE.EDR.cesure
+  };
+  const EMPTY = {operator:"Indifférent", values:[]};
+  const LS_EDR = "edr_offline_saves_v1";
+  const EDR = {
+    name:"",
+    montant:0,
+    student:{ regime:DEFAULT_EDR.regime[0], inscriptionPrincipale:DEFAULT_EDR.inscriptionPrincipale[0], ueEeeAccords:DEFAULT_EDR.ueEeeAccords[0], profilsSpecifiques:DEFAULT_EDR.profilsSpecifiques.at(-1), boursesAides:DEFAULT_EDR.boursesAides[0], cesure:DEFAULT_EDR.cesure[1] },
+    combos:[{id:uid(), title:"Combinaison 1", exo:false, amountAfter:0,
+      regime:{...EMPTY}, inscriptionPrincipale:{...EMPTY}, ueEeeAccords:{...EMPTY}, profilsSpecifiques:{...EMPTY}, boursesAides:{...EMPTY}, cesure:{...EMPTY}}],
+    result:{price:0, reason:"Cliquez RUN pour tester."}
+  };
+  const num = (x)=> Number(x)||0;
+  function matchCond(c,v){ if(c.operator==="Indifférent") return true; if(c.operator==="Parmi") return c.values.includes(v); return v!=="" && !c.values.includes(v); }
+  function specificity(c){ return ["regime","inscriptionPrincipale","ueEeeAccords","profilsSpecifiques","boursesAides","cesure"].reduce((n,k)=> n + (c[k].operator!=="Indifférent"), 0); }
+
+  function computePriceForEDRConfig(cfg, student){
+    const combos = (cfg.combos || []);
+    const matches = combos.map((c,idx)=>({
+      idx,
+      c,
+      ok:
+        matchCond(c.regime,student.regime)&&
+        matchCond(c.inscriptionPrincipale,student.inscriptionPrincipale)&&
+        matchCond(c.ueEeeAccords,student.ueEeeAccords)&&
+        matchCond(c.profilsSpecifiques,student.profilsSpecifiques)&&
+        matchCond(c.boursesAides,student.boursesAides)&&
+        matchCond(c.cesure,student.cesure),
+      spec:specificity(c)
+    })).filter(x=>x.ok);
+
+    const base = Number(cfg.montant)||0;
+    if(matches.length===0) return {price:base, reason:"Aucune combinaison – montant de base."};
+    const exo=matches.filter(x=>x.c.exo);
+    if(exo.length===0) return {price:base, reason:"Pas d'exonération applicable – montant de base."};
+    exo.sort((a,b)=> b.spec-a.spec || (Number(a.c.amountAfter)||0)-(Number(b.c.amountAfter)||0) || a.idx-b.idx);
+    const ch=exo[0];
+    return {price:(Number(ch.c.amountAfter)||0), reason:`Exonération via « ${ch.c.title} » (spécificité ${ch.spec})`};
+  }
+
+  function computeEDR(){
+    return computePriceForEDRConfig(EDR, EDR.student);
+  }
+
+  function collectEDR(){ return JSON.parse(JSON.stringify(EDR)); }
+  function loadEDR(item){
+    if(!item) return;
+    const data = item.payload || item; // Support both new format (item) and old format (direct payload)
+    const fallbackName = item.name || ""; // Use item.name as fallback if payload.name doesn't exist
+    Object.assign(EDR, { 
+      name: data.name || fallbackName, 
+      montant: data.montant||0, 
+      student: data.student||EDR.student, 
+      combos: (data.combos||[]).map(c=>({ ...c, id:uid() })) 
+    });
+    renderEDR();
+  }
+
+  function renderEdrSaves(){
+    const list=document.getElementById('edrList'); if(!list) return;
+    const items=JSON.parse(localStorage.getItem(LS_EDR)||'[]');
+    if(!items.length){
+      list.innerHTML = '<div class="muted">Aucune configuration enregistrée.</div>';
+      return;
+    }
+    list.innerHTML = `
+      <div>
+        <label>Sélectionner une configuration</label>
+        <select id="edrSelect" style="margin-bottom:10px">
+          <option value="">(Choisir une configuration)</option>
+          ${items.map(t=>`<option value="${t.id}">${t.name}</option>`).join('')}
+        </select>
+      </div>
+      <div class="row">
+        <button class="btn primary" id="edrLoadBtn">Charger</button>
+        <button class="btn danger" id="edrDelBtn">Supprimer</button>
+      </div>
+    `;
+    const select = list.querySelector('#edrSelect');
+    const loadBtn = list.querySelector('#edrLoadBtn');
+    const delBtn = list.querySelector('#edrDelBtn');
+    
+    loadBtn.onclick = ()=>{
+      const selectedId = select.value;
+      if(!selectedId) return;
+      const item = items.find(x=>x.id===selectedId);
+      if(item) loadEDR(item);
+    };
+    
+    delBtn.onclick = ()=>{
+      const selectedId = select.value;
+      if(!selectedId) return;
+      if(!confirm('Êtes-vous sûr de vouloir supprimer cette configuration ?')) return;
+      const rest = items.filter(x=>x.id!==selectedId);
+      localStorage.setItem(LS_EDR, JSON.stringify(rest));
+      renderEdrSaves();
+      renderEdrExportPanel();
+    };
+  }
+  function saveEDR(){
+    const name=(EDR.name||'').trim(); if(!name){ alert("Veuillez saisir un nom pour l'élément de droit."); return; }
+    const items=JSON.parse(localStorage.getItem(LS_EDR)||'[]'); items.unshift({id:uid(), name, payload:collectEDR()});
+    localStorage.setItem(LS_EDR, JSON.stringify(items));
+    renderEdrSaves(); renderEdrExportPanel();
+  }
+
+  /* ======== TARIFS ======== */
+  const LS_TARIF = "tarifs_offline_v1";
+  const TARIF_DEFAULT_STUDENT = {
+    regime: DEFAULT_EDR.regime[0],
+    inscriptionPrincipale: DEFAULT_EDR.inscriptionPrincipale[0],
+    ueEeeAccords: DEFAULT_EDR.ueEeeAccords[0],
+    profilsSpecifiques: DEFAULT_EDR.profilsSpecifiques.at(-1),
+    boursesAides: DEFAULT_EDR.boursesAides[0],
+    cesure: DEFAULT_EDR.cesure[1]
+  };
+  let TARIF = {
+    label: "",
+    student: { ...TARIF_DEFAULT_STUDENT },
+    lines: [],
+    result: { total: 0, detail: "Cliquez RUN pour tester la tarification." }
+  };
+  function loadTarif(obj){
+    const baseResult = { total: 0, detail: "Cliquez RUN pour tester la tarification." };
+    if (!obj) {
+      TARIF = { label:"", student:{...TARIF_DEFAULT_STUDENT}, lines:[], result:baseResult };
+    } else {
+      TARIF = {
+        label: obj.label || obj.name || "",
+        student: obj.student || { ...TARIF_DEFAULT_STUDENT },
+        lines: obj.lines || [],
+        result: obj.result || baseResult
+      };
+    }
+  }
+  function collectTarif(){ return JSON.parse(JSON.stringify(TARIF)); }
+
+  /* ======== PJ ======== */
+  // ⚠️ VALEURS NON MODIFIABLES - NE PAS MODIFIER
+  // Ces valeurs sont fixes et ne doivent jamais être modifiées
+  const PJ_FIXED_VALUES = {
+    CONTEXTE_INSCRIPTION: ["PRIMO-ENTRANT","REINSCRIPTION","NEO BACHELIER"],
+    AGE: ["MOINS_18","18_25","26_30","PLUS_30"],
+    TEMOIN_CVEC: ["OUI","NON"]
+  };
+  
+  // ✏️ VALEURS MODIFIABLES - Voir config.js
+  // Les valeurs ci-dessous proviennent du fichier config.js externe
+  const DEFAULT_PJ = {
+    CONTEXTE_INSCRIPTION: PJ_FIXED_VALUES.CONTEXTE_INSCRIPTION,
+    REGIME_INSCRIPTION: CONFIG_MODIFIABLE.EDR.regime,
+    PROFIL: CONFIG_MODIFIABLE.EDR.profilsSpecifiques,
+    BOURSE: CONFIG_MODIFIABLE.EDR.boursesAides,
+    REGIME_SPECIAL_ETUDE: CONFIG_MODIFIABLE.PJ.REGIME_SPECIAL_ETUDE,
+    SITUATION_MILITAIRE: CONFIG_MODIFIABLE.PJ.SITUATION_MILITAIRE,
+    PIA: CONFIG_MODIFIABLE.PJ.PIA,
+    TYPE_DIPLOME: CONFIG_MODIFIABLE.PJ.TYPE_DIPLOME,
+    STRUCTURE_PRINCIPALE: CONFIG_MODIFIABLE.PJ.STRUCTURE_PRINCIPALE,
+    AGE: PJ_FIXED_VALUES.AGE,
+    TEMOIN_CVEC: PJ_FIXED_VALUES.TEMOIN_CVEC
+  };
+  const OPS_PJ = ["Parmi","Différent de","Aucun ou Différent de"];
+  const LS_PJ  = "pj_offline_global_v2";
+  /* ======== Export générique ======== */
+  // Function to save file with user-selected location
+  async function saveFileWithPicker(content, suggestedName) {
+    // Check if File System Access API is supported
+    // Try to use it even if detection is uncertain (for Brave compatibility)
+    if ('showSaveFilePicker' in window || typeof window.showSaveFilePicker === 'function') {
+      try {
+        const handle = await window.showSaveFilePicker({
+          suggestedName: suggestedName,
+          types: [{
+            description: 'Fichiers JSON',
+            accept: {'application/json': ['.json']},
+          }],
+        });
+        
+        const writable = await handle.createWritable();
+        await writable.write(content);
+        await writable.close();
+        
+        return true; // Success
+      } catch (err) {
+        // User cancelled - don't show error
+        if (err.name === 'AbortError') {
+          return false; // User cancelled
+        }
+        // API not available or other error - fallback
+        console.error('Error with file picker:', err);
+        return null; // Will trigger fallback
+      }
+    } else {
+      // Fallback to automatic download for unsupported browsers
+      return null; // Indicates fallback needed
+    }
+  }
+  
+  function sanitizeFilename(name){
+    return name.replace(/[^a-z0-9éèêàâôûïç\s\-_]/gi, '').replace(/\s+/g, '-').toLowerCase().slice(0, 50);
+  }
+  function exportSelected(listId, storageKey, prefix){
+    const host=document.getElementById(listId); if(!host) return;
+    const ids=[...host.querySelectorAll('input[type=checkbox]:checked')].map(c=>c.getAttribute('data-id'));
+    if(!ids.length) return;
+    const items=JSON.parse(localStorage.getItem(storageKey)||'[]').filter(x=>ids.includes(x.id));
+    const blob=new Blob([JSON.stringify(items,null,2)],{type:"application/json"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    // Use first item name if only one selected, otherwise use generic name
+    const filename = items.length === 1 
+      ? `${prefix}-${sanitizeFilename(items[0].name)}-${new Date().toISOString().slice(0,10)}.json`
+      : `${prefix}-export-${items.length}-items-${new Date().toISOString().slice(0,10)}.json`;
+    a.href=url; a.download=filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+  async function exportAll(storageKey, prefix){
+    const items=JSON.parse(localStorage.getItem(storageKey)||'[]');
+    if(!items.length) return;
+    
+    const content = JSON.stringify(items, null, 2);
+    const filename = `${prefix}-export-all-${new Date().toISOString().slice(0,10)}.json`;
+    
+    const saved = await saveFileWithPicker(content, filename);
+    
+    // Fallback to automatic download if API not supported
+    if (saved === null) {
+      alert('ℹ️ Votre navigateur ne supporte pas la sélection de dossier.\n\nLe fichier sera téléchargé dans votre dossier de téléchargements par défaut.');
+      const blob = new Blob([content], {type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; 
+      a.download = filename;
+      document.body.appendChild(a); 
+      a.click(); 
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } else if (saved === true) {
+      alert('✅ Fichier enregistré avec succès !');
+    }
+    // If saved === false, user cancelled, no message needed
+  }
+  function importFromFile(inputEl, storageKey, after){
+    const f = inputEl.files && inputEl.files[0]; 
+    if(!f) {
+      console.warn('No file selected');
+      return;
+    }
+    
+    console.log('Import started:', {
+      fileName: f.name,
+      fileSize: f.size,
+      fileType: f.type,
+      storageKey: storageKey
+    });
+    
+    const reader=new FileReader();
+    reader.onload=()=>{
+      console.log('File loaded, size:', reader.result.length);
+      try{
+        const incoming=JSON.parse(reader.result||'[]');
+        console.log('JSON parsed successfully, items:', incoming.length);
+        
+        if(!Array.isArray(incoming)) {
+          const error = 'Format de fichier invalide. Le fichier doit contenir un tableau JSON.';
+          console.error(error, typeof incoming);
+          alert('❌ ' + error);
+          inputEl.value="";
+          return;
+        }
+        
+        if(incoming.length === 0) {
+          alert('⚠️ Le fichier est vide (0 éléments).');
+          inputEl.value="";
+          return;
+        }
+        
+        const cur=JSON.parse(localStorage.getItem(storageKey)||'[]');
+        console.log('Current items in storage:', cur.length);
+        
+        // Handle both old format (with payload) and new format (direct data)
+        const mapped=incoming.map((x, idx)=>{
+          // If item has a payload, use it; otherwise treat the item itself as the payload
+          const payload = x.payload || x;
+          const name = String(x.name || payload.name || 'Import '+new Date().toISOString().slice(0,10));
+          console.log(`Processing item ${idx}:`, name);
+          return {
+            id:uid(), 
+            name: name, 
+            payload: payload
+          };
+        });
+        
+        // Remove duplicates: keep existing items with different names, replace those with same names
+        const existingNames = new Set(mapped.map(m => m.name));
+        const filtered = cur.filter(item => !existingNames.has(item.name));
+        
+        const finalList = [...mapped, ...filtered];
+        localStorage.setItem(storageKey, JSON.stringify(finalList));
+        console.log('Storage updated. Total items:', finalList.length);
+        
+        const replaced = cur.length - filtered.length;
+        const added = mapped.length - replaced;
+        
+        let message = '';
+        if(replaced > 0 && added > 0) {
+          message = `✅ ${replaced} élément(s) remplacé(s), ${added} élément(s) ajouté(s).`;
+        } else if(replaced > 0) {
+          message = `✅ ${replaced} élément(s) remplacé(s).`;
+        } else {
+          message = `✅ ${added} élément(s) ajouté(s).`;
+        }
+        
+        console.log('Import successful:', message);
+        alert(message);
+        after && after();
+      }catch(e){
+        console.error('Import error:', e);
+        console.error('Error details:', {
+          message: e.message,
+          stack: e.stack,
+          fileContent: reader.result?.substring(0, 200) + '...'
+        });
+        alert('❌ Erreur lors de l\'import du fichier.\n\n' + e.message + '\n\nOuvrez la console (F12) pour plus de détails.');
+      }
+      inputEl.value="";
+    };
+    reader.onerror=(e)=>{
+      console.error('File read error:', e);
+      alert('❌ Erreur lors de la lecture du fichier.\n\nLe fichier est peut-être sur un lecteur réseau bloqué par le navigateur.\n\nSolution : Copiez le fichier sur votre disque local (ex: Bureau) et réessayez.');
+      inputEl.value="";
+    };
+    reader.readAsText(f);
+  }
+
+  /* ======== UI EDR ======== */
+  function renderEDR(){
+    const pane=document.getElementById('pane-edr'); pane.innerHTML='';
+
+    const header = el(`<div>
+      <div style="font-weight:700;font-size:20px">Paramétrage d'un élément de droit</div>
+      <div class="muted" style="margin-top:2px;font-size:12px">Tarification conditionnelle avec exonérations et priorisation.</div>
+    </div>`);
+    pane.appendChild(header);
+
+    const nameCard = el(`<div class="card">
+      <div class="row" style="justify-content:space-between;margin-bottom:12px">
+        <div style="flex:1">
+          <label>Nom de l'élément de droit</label>
+          <input id="edrName" placeholder="Ex: Droits d'inscription Master" value="${EDR.name||''}">
+        </div>
+        <div style="margin-left:12px;flex:0 0 200px">
+          <label>Montant de base (€)</label>
+          <input id="montantBase" type="number" min="0" step="0.01" value="${EDR.montant}">
+        </div>
+        <div style="align-self:flex-end;margin-left:12px">
+          <button id="edrSaveBtn" class="btn primary">Sauvegarder</button>
+        </div>
+      </div>
+      <div class="muted" style="font-size:12px">Le montant de base servira de valeur par défaut si aucune combinaison ne s'applique.</div>
+    </div>`);
+    pane.appendChild(nameCard);
+    nameCard.querySelector('#edrName').oninput = e => EDR.name = e.target.value;
+    nameCard.querySelector('#montantBase').oninput = e => EDR.montant = Number(e.target.value) || 0;
+    nameCard.querySelector('#edrSaveBtn').onclick = saveEDR;
+
+    const baseCard = el(`<div class="card">
+      <div class="title">Profil étudiant de test</div>
+      <div class="grid2">
+        <div>
+          <label>Régime d'inscription</label>
+          <select id="st-reg">
+            ${DEFAULT_EDR.regime.map(o=>`<option ${o===EDR.student.regime?'selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label>Inscription principale</label>
+          <select id="st-ins">
+            ${DEFAULT_EDR.inscriptionPrincipale.map(o=>`<option ${o===EDR.student.inscriptionPrincipale?'selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label>UE, EEE et accords</label>
+          <select id="st-ue">
+            ${DEFAULT_EDR.ueEeeAccords.map(o=>`<option ${o===EDR.student.ueEeeAccords?'selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label>Profils spécifiques</label>
+          <select id="st-prof">
+            ${DEFAULT_EDR.profilsSpecifiques.map(o=>`<option ${o===EDR.student.profilsSpecifiques?'selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label>Bourses et aides financières</label>
+          <select id="st-bourse">
+            ${DEFAULT_EDR.boursesAides.map(o=>`<option ${o===EDR.student.boursesAides?'selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label>Césure</label>
+          <select id="st-cesure">
+            ${DEFAULT_EDR.cesure.map(o=>`<option ${o===EDR.student.cesure?'selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+    </div>`);
+    pane.appendChild(baseCard);
+    baseCard.querySelector('#st-reg').onchange = e=>{EDR.student.regime=e.target.value;};
+    baseCard.querySelector('#st-ins').onchange = e=>{EDR.student.inscriptionPrincipale=e.target.value;};
+    baseCard.querySelector('#st-ue').onchange = e=>{EDR.student.ueEeeAccords=e.target.value;};
+    baseCard.querySelector('#st-prof').onchange = e=>{EDR.student.profilsSpecifiques=e.target.value;};
+    baseCard.querySelector('#st-bourse').onchange = e=>{EDR.student.boursesAides=e.target.value;};
+    baseCard.querySelector('#st-cesure').onchange = e=>{EDR.student.cesure=e.target.value;};
+
+    const combos = el(`<div class="card">
+      <div class="row" style="justify-content:space-between">
+        <div class="title">Combinaisons & exonérations</div>
+        <button id="addCombo" class="btn primary">+ Ajouter une combinaison</button>
+      </div>
+      <div class="muted" style="font-size:12px;margin-bottom:4px">Les combinaisons sont lues dans l'ordre d'affichage. Utilisez ↑ ↓ pour les prioriser.</div>
+      <div id="comboHost"></div>
+    </div>`);
+    pane.appendChild(combos);
+
+    function renderCombos(){
+      const host=combos.querySelector('#comboHost'); host.innerHTML='';
+      EDR.combos.forEach((c, idx)=>{
+        const card = el(`<div class="card" style="margin-top:10px">
+          <div class="row" style="justify-content:space-between">
+            <div class="row">
+              <input class="titleInput" value="${c.title}">
+              <span class="badge ${c.exo?'green':'blue'}">${c.exo?'Exonération':'Tarif'}</span>
+            </div>
+            <div class="row">
+              <button class="btn" data-mv="-1" ${idx===0?'disabled':''}>↑</button>
+              <button class="btn" data-mv="1"  ${idx===EDR.combos.length-1?'disabled':''}>↓</button>
+              <button class="btn danger" data-del>Supprimer</button>
+            </div>
+          </div>
+          <div class="row" style="margin-top:8px;justify-content:space-between">
+            <div class="row">
+              <span>Exonération ?</span>
+              <div class="toggle ${c.exo?'on':''}" data-toggle><span></span></div>
+            </div>
+            <div style="max-width:260px">
+              <label>${c.exo?'Montant après exonération (€)':'Tarif (€) (désactivé si Exonération = Non)'}</label>
+              <input class="amt" type="number" min="0" step="0.01" value="${c.amountAfter}">
+            </div>
+          </div>
+          <div style="height:8px"></div>
+          <div class="col"></div>
+        </div>`);
+        host.appendChild(card);
+        card.querySelector('.titleInput').oninput = e=> c.title=e.target.value;
+        const tgl=card.querySelector('[data-toggle]'), amt=card.querySelector('.amt');
+        tgl.onclick=()=>{ c.exo=!c.exo; tgl.classList.toggle('on',c.exo); card.querySelector('label').textContent = c.exo?'Montant après exonération (€)':'Tarif (€) (désactivé si Exonération = Non)'; };
+        amt.oninput=e=> c.amountAfter=Number(e.target.value)||0;
+        card.querySelector('[data-del]').onclick=()=>{ EDR.combos = EDR.combos.filter(x=>x!==c); renderEDR(); };
+        card.querySelectorAll('[data-mv]').forEach(b=> b.onclick=(e)=>{
+          const dir=Number(e.target.getAttribute('data-mv')); const i=EDR.combos.indexOf(c); const j=i+dir;
+          if(j<0||j>=EDR.combos.length) return;
+          const it=EDR.combos.splice(i,1)[0]; EDR.combos.splice(j,0,it); renderEDR();
+        });
+        const col = card.querySelector('.col');
+
+        function addCritRow(label,cond,options){
+          const row = el(`<div class="row4" style="margin-top:8px">
+            <div style="align-self:center;font-weight:600;font-size:14px">${label}</div>
+            <div><select class="op">${OPS.map(o=>`<option ${o===cond.operator?'selected':''}>${o}</option>`).join('')}</select></div>
+            <div data-multi></div>
+          </div>`);
+          col.appendChild(row);
+          const multiHost=row.querySelector('[data-multi]');
+          const multi=createMulti({options, selected:cond.values.slice(), onChange:vals=>cond.values=vals, placeholder:"(Indifférent)"});
+          multiHost.appendChild(multi.root);
+          row.querySelector('.op').onchange=e=>{
+            cond.operator=e.target.value;
+            if(cond.operator==="Indifférent"){cond.values=[];multi.setSelected([]);}
+          };
+        }
+        addCritRow("Régimes d'inscription", c.regime, DEFAULT_EDR.regime);
+        addCritRow("Inscription principale", c.inscriptionPrincipale, DEFAULT_EDR.inscriptionPrincipale);
+        addCritRow("UE, EEE et accords", c.ueEeeAccords, DEFAULT_EDR.ueEeeAccords);
+        addCritRow("Profils spécifiques", c.profilsSpecifiques, DEFAULT_EDR.profilsSpecifiques);
+        addCritRow("Bourses et aides", c.boursesAides, DEFAULT_EDR.boursesAides);
+        addCritRow("Césure", c.cesure, DEFAULT_EDR.cesure);
+      });
+    }
+    combos.querySelector('#addCombo').onclick=()=>{EDR.combos.push({id:uid(), title:"Combinaison "+(EDR.combos.length+1), exo:false, amountAfter:0,
+      regime:{...EMPTY}, inscriptionPrincipale:{...EMPTY}, ueEeeAccords:{...EMPTY}, profilsSpecifiques:{...EMPTY}, boursesAides:{...EMPTY}, cesure:{...EMPTY}}); renderEDR();};
+    renderCombos();
+
+    const res = el(`<div class="card">
+      <div class="title">Résultat de tarification</div>
+      <div class="row" style="justify-content:space-between">
+        <div style="font-size:20px;font-weight:700">Tarif appliqué : <span id="price">${(EDR.result.price||0).toFixed(2)}</span> €</div>
+        <button id="run" class="btn primary">RUN / Tester</button>
+      </div>
+      <div id="reason" class="muted" style="margin-top:6px">${EDR.result.reason}</div>
+    </div>`);
+    pane.appendChild(res);
+    res.querySelector('#run').onclick=()=>{const r=computeEDR();EDR.result=r;res.querySelector('#price').textContent=r.price.toFixed(2);res.querySelector('#reason').textContent=r.reason;};
+
+    pane.appendChild(el('<details class="card" id="edr-saves"><summary><div class="title">Configurations enregistrées</div></summary><div class="details-content" id="edrList"></div></details>'));
+    renderEdrSaves();
+
+    const exportCard = el(`<details class="card">
+      <summary>
+        <div class="title">Export / Import sélectif des EDR</div>
+      </summary>
+      <div class="details-content">
+        <div>
+          <div style="font-weight:600;margin-bottom:6px">Sélection EDR</div>
+          <div id="export-edr-list"></div>
+          <div class="row" style="margin-top:10px">
+            <button class="btn" id="edr-export-selected">Exporter sélection</button>
+            <button class="btn" id="edr-export-all">Exporter tout</button>
+          </div>
+          <div class="mt-2 muted" style="font-size:12px">
+            <strong>Export sélectif :</strong> Pour partager uniquement certains EDR avec un collègue.<br>
+            <em>Pour un backup complet (EDR+Tarifs+PJ), voir l'onglet Options.</em>
+          </div>
+        </div>
+        <div class="mt-4" style="border-top:1px dashed #e5e7eb;padding-top:14px">
+          <div style="font-weight:600;margin-bottom:6px">Import de configurations EDR</div>
+          <div class="row">
+            <input type="file" id="edr-import-file" accept="application/json">
+            <span class="muted" style="font-size:12px">Fichiers d'export EDR uniquement.</span>
+          </div>
+        </div>
+      </div>
+    </details>`);
+    pane.appendChild(exportCard);
+    renderEdrExportPanel();
+  }
+
+  function renderEdrExportPanel(){
+    const host=document.getElementById('export-edr-list'); if(!host) return;
+    const items=JSON.parse(localStorage.getItem(LS_EDR)||'[]');
+    if(!items.length){
+      host.innerHTML = '<div class="muted">Aucune configuration EDR.</div>';
+      return;
+    }
+    
+    // Create multi-select dropdown
+    const container = document.createElement('div');
+    const label = document.createElement('label');
+    label.textContent = 'Sélectionner une ou plusieurs configurations';
+    label.style.display = 'block';
+    label.style.marginBottom = '6px';
+    
+    let selectedIds = [];
+    const multiSelect = createMulti({
+      options: items.map(it => it.name),
+      selected: [],
+      onChange: (selected) => {
+        // Map names back to IDs
+        selectedIds = selected.map(name => {
+          const item = items.find(it => it.name === name);
+          return item ? item.id : null;
+        }).filter(Boolean);
+      },
+      placeholder: '(Sélectionner des configurations)'
+    });
+    
+    container.appendChild(label);
+    container.appendChild(multiSelect.root);
+    host.innerHTML = '';
+    host.appendChild(container);
+    
+    const btnSel=document.getElementById('edr-export-selected');
+    const btnAll=document.getElementById('edr-export-all');
+    const file=document.getElementById('edr-import-file');
+    
+    if(btnSel){
+      btnSel.onclick=async ()=>{
+        if(!selectedIds.length) {
+          alert('⚠️ Veuillez sélectionner au moins une configuration à exporter.');
+          return;
+        }
+        const selectedItems = items.filter(x=>selectedIds.includes(x.id));
+        const content = JSON.stringify(selectedItems, null, 2);
+        
+        const filename = selectedItems.length === 1 
+          ? `edr-${sanitizeFilename(selectedItems[0].name)}-${new Date().toISOString().slice(0,10)}.json`
+          : `edr-export-${selectedItems.length}-items-${new Date().toISOString().slice(0,10)}.json`;
+        
+        const saved = await saveFileWithPicker(content, filename);
+        
+        // Fallback to automatic download if API not supported
+        if (saved === null) {
+          alert('ℹ️ Votre navigateur ne supporte pas la sélection de dossier.\n\nLe fichier sera téléchargé dans votre dossier de téléchargements par défaut.');
+          const blob = new Blob([content], {type:"application/json"});
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url; 
+          a.download = filename;
+          document.body.appendChild(a); 
+          a.click(); 
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        } else if (saved === true) {
+          alert('✅ Fichier enregistré avec succès !');
+        }
+        // If saved === false, user cancelled, no message needed
+      };
+    }
+    if(btnAll){btnAll.onclick=()=>exportAll(LS_EDR,'edr');}
+    if(file){file.onchange=e=>importFromFile(e.target,LS_EDR,()=>{renderEdrSaves();renderEdrExportPanel();});}
+  }
+
+  /* ======== UI TARIFS ======== */
+  function renderTarif(){
+    const pane=document.getElementById('pane-tarif'); pane.innerHTML='';
+
+    const header = el(`<div>
+      <div style="font-size:20px;font-weight:700">Tarifications</div>
+    </div>`);
+    pane.appendChild(header);
+
+    const labelCard = el(`<div class="card">
+      <div class="row" style="justify-content:space-between">
+        <div style="flex:1">
+          <label>Libellé de la tarification</label>
+          <input id="tarifLabel" placeholder="Ex: Tarification Master 2024-2025" value="${TARIF.label || ''}">
+        </div>
+        <div style="align-self:flex-end;margin-left:12px">
+          <button id="tarifSaveBtn" class="btn primary">Sauvegarder</button>
+        </div>
+      </div>
+    </div>`);
+    pane.appendChild(labelCard);
+    
+    labelCard.querySelector('#tarifLabel').oninput = e => { TARIF.label = e.target.value; };
+    labelCard.querySelector('#tarifSaveBtn').onclick = () => {
+      const saveName = (TARIF.label || '').trim();
+      if (!saveName) { alert("Veuillez saisir un libellé pour la tarification."); return; }
+      const items = JSON.parse(localStorage.getItem(LS_TARIF) || '[]');
+      items.unshift({ id: uid(), name: saveName, payload: collectTarif() });
+      localStorage.setItem(LS_TARIF, JSON.stringify(items));
+      renderTarif();
+    };
+
+    const studentCard = el(`<div class="card">
+      <div class="title">Profil étudiant de test</div>
+      <div class="grid2">
+        <div>
+          <label>Régime d'inscription</label>
+          <select id="tar-st-reg">
+            ${DEFAULT_EDR.regime.map(o => `<option ${o === TARIF.student.regime ? 'selected' : ''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label>Inscription principale</label>
+          <select id="tar-st-ins">
+            ${DEFAULT_EDR.inscriptionPrincipale.map(o => `<option ${o === TARIF.student.inscriptionPrincipale ? 'selected' : ''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label>UE, EEE et accords</label>
+          <select id="tar-st-ue">
+            ${DEFAULT_EDR.ueEeeAccords.map(o => `<option ${o === TARIF.student.ueEeeAccords ? 'selected' : ''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label>Profils spécifiques</label>
+          <select id="tar-st-prof">
+            ${DEFAULT_EDR.profilsSpecifiques.map(o => `<option ${o === TARIF.student.profilsSpecifiques ? 'selected' : ''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label>Bourses et aides financières</label>
+          <select id="tar-st-bourse">
+            ${DEFAULT_EDR.boursesAides.map(o => `<option ${o === TARIF.student.boursesAides ? 'selected' : ''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label>Césure</label>
+          <select id="tar-st-cesure">
+            ${DEFAULT_EDR.cesure.map(o => `<option ${o === TARIF.student.cesure ? 'selected' : ''}>${o}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+    </div>`);
+    pane.appendChild(studentCard);
+
+    studentCard.querySelector('#tar-st-reg').onchange = e => TARIF.student.regime = e.target.value;
+    studentCard.querySelector('#tar-st-ins').onchange = e => TARIF.student.inscriptionPrincipale = e.target.value;
+    studentCard.querySelector('#tar-st-ue').onchange = e => TARIF.student.ueEeeAccords = e.target.value;
+    studentCard.querySelector('#tar-st-prof').onchange = e => TARIF.student.profilsSpecifiques = e.target.value;
+    studentCard.querySelector('#tar-st-bourse').onchange = e => TARIF.student.boursesAides = e.target.value;
+    studentCard.querySelector('#tar-st-cesure').onchange = e => TARIF.student.cesure = e.target.value;
+
+    const linesCard = el(`<div class="card">
+      <div class="title">Composition de la tarification</div>
+      <div id="tarif-lines"></div>
+      <div style="height:8px"></div>
+      <button id="tarifAddLine" class="btn primary">+ Ajouter une ligne</button>
+    </div>`);
+    pane.appendChild(linesCard);
+    linesCard.querySelector('#tarifAddLine').onclick = () => {
+      TARIF.lines.push({ id: uid(), edrRefId: null, edrName: "" });
+      renderTarif();
+    };
+
+    const edrItems = JSON.parse(localStorage.getItem(LS_EDR) || '[]');
+
+    function computeTarifLineDetail(line) {
+      const edrItem = edrItems.find(it => it.id === line.edrRefId);
+      if (!edrItem) return "Aucune config EDR sélectionnée.";
+      const cfg = edrItem.payload;
+      const res = computePriceForEDRConfig(cfg, TARIF.student);
+      const unitPrice = res.price;
+      const origin = `EDR « ${edrItem.name} »`;
+      return `${edrItem.name} : ${unitPrice.toFixed(2)} € (${origin})`;
+    }
+
+    const hostLines = linesCard.querySelector('#tarif-lines');
+    TARIF.lines.forEach(line=>{
+      const row = el(`<div class="card" style="padding:12px;margin-top:8px">
+        <div>
+          <label>Élément de droit (config EDR)</label>
+          <select class="tar-edr-select">
+            <option value="">(aucun)</option>
+            ${edrItems.map(it => `<option value="${it.id}" ${it.id === line.edrRefId ? 'selected' : ''}>${it.name}</option>`).join('')}
+          </select>
+        </div>
+        <div class="row" style="margin-top:8px;justify-content:space-between">
+          <div class="muted tar-line-info"></div>
+          <button class="btn danger tar-del">Supprimer</button>
+        </div>
+      </div>`);
+      hostLines.appendChild(row);
+      const sel=row.querySelector('.tar-edr-select');
+      const info=row.querySelector('.tar-line-info');
+      sel.onchange=e=>{
+        line.edrRefId=e.target.value||null;
+        const found=edrItems.find(it=>it.id===line.edrRefId);
+        line.edrName=found?found.name:"";
+        info.textContent=computeTarifLineDetail(line);
+      };
+      row.querySelector('.tar-del').onclick=()=>{
+        TARIF.lines=TARIF.lines.filter(x=>x!==line);
+        renderTarif();
+      };
+      info.textContent=computeTarifLineDetail(line);
+    });
+
+    const resCard = el(`<div class="card">
+      <div class="title">Résultat de la tarification</div>
+      <div class="row" style="justify-content:space-between">
+        <div style="font-size:20px;font-weight:700">
+          Total: <span id="tarif-total">${TARIF.result.total.toFixed(2)}</span> €
+        </div>
+        <button id="tarif-run" class="btn primary">RUN / Tester</button>
+      </div>
+      <div id="tarif-detail" class="muted" style="margin-top:6px">${TARIF.result.detail}</div>
+    </div>`);
+    pane.appendChild(resCard);
+
+    function computeTarifGlobal(){
+      let total=0; const details=[];
+      TARIF.lines.forEach(line=>{
+        const edrItem=edrItems.find(it=>it.id===line.edrRefId);
+        if(!edrItem){details.push("Ligne sans EDR ignorée."); return;}
+        const cfg=edrItem.payload;
+        const res=computePriceForEDRConfig(cfg,TARIF.student);
+        total+=res.price;
+        details.push(computeTarifLineDetail(line));
+      });
+      if(!TARIF.lines.length) return {total:0, detail:"Aucune ligne dans la tarification."};
+      return {total, detail:details.join(" | ")};
+    }
+
+    resCard.querySelector('#tarif-run').onclick=()=>{
+      const r=computeTarifGlobal();
+      TARIF.result=r;
+      resCard.querySelector('#tarif-total').textContent=r.total.toFixed(2);
+      resCard.querySelector('#tarif-detail').textContent=r.detail;
+      renderTarif();
+    };
+
+    const listCard = el(`<details class="card">
+      <summary>
+        <div class="title">Tarifications enregistrées</div>
+      </summary>
+      <div class="details-content" id="tarifList"></div>
+    </details>`);
+    pane.appendChild(listCard);
+
+    const listHost=listCard.querySelector('#tarifList');
+    const items=JSON.parse(localStorage.getItem(LS_TARIF)||'[]');
+    if(!items.length){
+      listHost.innerHTML='<div class="muted">Aucune tarification enregistrée.</div>';
+    }else{
+      listHost.innerHTML = `
+        <div>
+          <label>Sélectionner une tarification</label>
+          <select id="tarifSelectLoad" style="margin-bottom:10px">
+            <option value="">(Choisir une tarification)</option>
+            ${items.map(t=>`<option value="${t.id}">${t.name}</option>`).join('')}
+          </select>
+        </div>
+        <div class="row">
+          <button class="btn primary" id="tarifLoadBtn">Charger</button>
+          <button class="btn danger" id="tarifDelBtn">Supprimer</button>
+        </div>
+      `;
+      const select = listHost.querySelector('#tarifSelectLoad');
+      const loadBtn = listHost.querySelector('#tarifLoadBtn');
+      const delBtn = listHost.querySelector('#tarifDelBtn');
+      
+      loadBtn.onclick = ()=>{
+        const selectedId = select.value;
+        if(!selectedId) return;
+        const item = items.find(x=>x.id===selectedId);
+        if(item){ loadTarif(item.payload); renderTarif(); }
+      };
+      
+      delBtn.onclick = ()=>{
+        const selectedId = select.value;
+        if(!selectedId) return;
+        if(!confirm('Êtes-vous sûr de vouloir supprimer cette tarification ?')) return;
+        const rest = items.filter(x=>x.id!==selectedId);
+        localStorage.setItem(LS_TARIF, JSON.stringify(rest));
+        renderTarif();
+        renderTarifExportPanel();
+      };
+    }
+
+    const exportCard = el(`<details class="card">
+      <summary>
+        <div class="title">Export / Import sélectif des tarifications</div>
+      </summary>
+      <div class="details-content">
+        <div>
+          <div style="font-weight:600;margin-bottom:6px">Sélection Tarifications</div>
+          <div id="export-tarif-list"></div>
+          <div class="row" style="margin-top:10px">
+            <button class="btn" id="tarif-export-selected">Exporter sélection</button>
+            <button class="btn" id="tarif-export-all">Exporter tout</button>
+          </div>
+          <div class="mt-2 muted" style="font-size:12px">
+            <strong>Export sélectif :</strong> Pour partager uniquement certaines tarifications.<br>
+            <em>Pour un backup complet (EDR+Tarifs+PJ), voir l'onglet Options.</em>
+          </div>
+        </div>
+        <div class="mt-4" style="border-top:1px dashed #e5e7eb;padding-top:14px">
+          <div style="font-weight:600;margin-bottom:6px">Import de tarifications</div>
+          <div class="row">
+            <input type="file" id="tarif-import-file" accept="application/json">
+            <span class="muted" style="font-size:12px">Fichiers d'export Tarifications uniquement.</span>
+          </div>
+        </div>
+      </div>
+    </details>`);
+    pane.appendChild(exportCard);
+    renderTarifExportPanel();
+  }
+
+  function renderTarifExportPanel(){
+    const host=document.getElementById('export-tarif-list'); if(!host) return;
+    const items=JSON.parse(localStorage.getItem(LS_TARIF)||'[]');
+    if(!items.length){
+      host.innerHTML = '<div class="muted">Aucune tarification.</div>';
+      return;
+    }
+    
+    // Create multi-select dropdown
+    const container = document.createElement('div');
+    const label = document.createElement('label');
+    label.textContent = 'Sélectionner une ou plusieurs tarifications';
+    label.style.display = 'block';
+    label.style.marginBottom = '6px';
+    
+    let selectedIds = [];
+    const multiSelect = createMulti({
+      options: items.map(it => it.name),
+      selected: [],
+      onChange: (selected) => {
+        // Map names back to IDs
+        selectedIds = selected.map(name => {
+          const item = items.find(it => it.name === name);
+          return item ? item.id : null;
+        }).filter(Boolean);
+      },
+      placeholder: '(Sélectionner des tarifications)'
+    });
+    
+    container.appendChild(label);
+    container.appendChild(multiSelect.root);
+    host.innerHTML = '';
+    host.appendChild(container);
+    
+    const btnSel=document.getElementById('tarif-export-selected');
+    const btnAll=document.getElementById('tarif-export-all');
+    const file=document.getElementById('tarif-import-file');
+    
+    if(btnSel){
+      btnSel.onclick=async ()=>{
+        if(!selectedIds.length) {
+          alert('⚠️ Veuillez sélectionner au moins une tarification à exporter.');
+          return;
+        }
+        const selectedItems = items.filter(x=>selectedIds.includes(x.id));
+        const content = JSON.stringify(selectedItems, null, 2);
+        
+        const filename = selectedItems.length === 1 
+          ? `tarifs-${sanitizeFilename(selectedItems[0].name)}-${new Date().toISOString().slice(0,10)}.json`
+          : `tarifs-export-${selectedItems.length}-items-${new Date().toISOString().slice(0,10)}.json`;
+        
+        const saved = await saveFileWithPicker(content, filename);
+        
+        // Fallback to automatic download if API not supported
+        if (saved === null) {
+          alert('ℹ️ Votre navigateur ne supporte pas la sélection de dossier.\n\nLe fichier sera téléchargé dans votre dossier de téléchargements par défaut.');
+          const blob = new Blob([content], {type:"application/json"});
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url; 
+          a.download = filename;
+          document.body.appendChild(a); 
+          a.click(); 
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        } else if (saved === true) {
+          alert('✅ Fichier enregistré avec succès !');
+        }
+        // If saved === false, user cancelled, no message needed
+      };
+    }
+    if(btnAll){btnAll.onclick=()=>exportAll(LS_TARIF,'tarifs');}
+    if(file){file.onchange=e=>importFromFile(e.target,LS_TARIF,()=>{renderTarif();renderTarifExportPanel();});}
+  }
+
+
+  /* ======== UI PJ ======== */
+
+  // PJ - Etat global
+  const PJ_KEYS = [
+    "CONTEXTE_INSCRIPTION",
+    "REGIME_INSCRIPTION",
+    "PROFIL",
+    "BOURSE",
+    "REGIME_SPECIAL_ETUDE",
+    "SITUATION_MILITAIRE",
+    "PIA",
+    "TYPE_DIPLOME",
+    "STRUCTURE_PRINCIPALE",
+    "AGE",
+    "TEMOIN_CVEC"
+  ];
+
+  // Profil étudiant de test (critères)
+  let pjTestProfile = {
+    CONTEXTE_INSCRIPTION: DEFAULT_PJ.CONTEXTE_INSCRIPTION[0],
+    REGIME_INSCRIPTION: DEFAULT_PJ.REGIME_INSCRIPTION[0],
+    PROFIL: DEFAULT_PJ.PROFIL[0],
+    BOURSE: DEFAULT_PJ.BOURSE[0],
+    REGIME_SPECIAL_ETUDE: DEFAULT_PJ.REGIME_SPECIAL_ETUDE[0],
+    SITUATION_MILITAIRE: DEFAULT_PJ.SITUATION_MILITAIRE[0],
+    PIA: DEFAULT_PJ.PIA[0],
+    TYPE_DIPLOME: DEFAULT_PJ.TYPE_DIPLOME[0],
+    STRUCTURE_PRINCIPALE: DEFAULT_PJ.STRUCTURE_PRINCIPALE[0],
+    AGE: DEFAULT_PJ.AGE[0],
+    TEMOIN_CVEC: DEFAULT_PJ.TEMOIN_CVEC[0]
+  };
+
+  // Profil étudiant de test (dépôt) - stocke l'état de dépôt pour chaque PJ par ID
+  let pjStudentDeposits = {};
+
+  // Règle PJ en cours d'édition
+  let pjDraft = {
+    id:null,
+    code_pj:"",
+    libelle:"",
+    desc:"",
+    debut:"",
+    fin:"",
+    prio:0,
+    // Paramètres de dépôt au niveau de la règle
+    depot:{
+      televersement: false,  // Permet dépôt en ligne
+      bloquante: false,      // Empêche l'étudiant de continuer si pas déposé
+      validation_gestionnaire: false  // Nécessite validation gestionnaire
+    },
+    // Critères d'exigibilité
+    criteria:{
+      CONTEXTE_INSCRIPTION:{operator:"Parmi", values:[]},
+      REGIME_INSCRIPTION:{operator:"Parmi", values:[]},
+      PROFIL:{operator:"Parmi", values:[]},
+      BOURSE:{operator:"Parmi", values:[]},
+      REGIME_SPECIAL_ETUDE:{operator:"Parmi", values:[]},
+      SITUATION_MILITAIRE:{operator:"Parmi", values:[]},
+      PIA:{operator:"Parmi", values:[]},
+      TYPE_DIPLOME:{operator:"Parmi", values:[]},
+      STRUCTURE_PRINCIPALE:{operator:"Parmi", values:[]},
+      AGE:{operator:"Parmi", values:[]},
+      TEMOIN_CVEC:{operator:"Parmi", values:[]}
+    }
+  };
+
+  function pjResetDraft(){
+    pjDraft = {
+      id:null,
+      code_pj:"",
+      libelle:"",
+      desc:"",
+      debut:"",
+      fin:"",
+      prio:0,
+      depot:{
+        televersement: false,
+        bloquante: false,
+        validation_gestionnaire: false
+      },
+      criteria:{
+        CONTEXTE_INSCRIPTION:{operator:"Parmi", values:[]},
+        REGIME_INSCRIPTION:{operator:"Parmi", values:[]},
+        PROFIL:{operator:"Parmi", values:[]},
+        BOURSE:{operator:"Parmi", values:[]},
+        REGIME_SPECIAL_ETUDE:{operator:"Parmi", values:[]},
+        SITUATION_MILITAIRE:{operator:"Parmi", values:[]},
+        PIA:{operator:"Parmi", values:[]},
+        TYPE_DIPLOME:{operator:"Parmi", values:[]},
+        STRUCTURE_PRINCIPALE:{operator:"Parmi", values:[]},
+        AGE:{operator:"Parmi", values:[]},
+        TEMOIN_CVEC:{operator:"Parmi", values:[]}
+      }
+    };
+  }
+
+  function pjRuleName(d){
+    const a = (d.code_pj||"").trim();
+    const b = (d.libelle||"").trim();
+    if(a && b) return `${a} - ${b}`;
+    return (a || b || "Règle PJ");
+  }
+
+  function pjMatchCriterion(criterion, studentValue){
+    if(!criterion) return true;
+    const vals = Array.isArray(criterion.values) ? criterion.values : [];
+    if(vals.length === 0) return true; // (Tous)
+    if(criterion.operator === "Différent de") return !vals.includes(studentValue);
+    if(criterion.operator === "Aucun ou Différent de") return !studentValue || !vals.includes(studentValue);
+    // "Parmi"
+    return vals.includes(studentValue);
+  }
+
+  function pjRuleApplies(rulePayload, student){
+    const c = rulePayload.criteria || {};
+    return PJ_KEYS.every(k => pjMatchCriterion(c[k], student[k]));
+  }
+
+  function pjSaveDraft(){
+    const name = pjRuleName(pjDraft);
+    const items = JSON.parse(localStorage.getItem(LS_PJ) || '[]');
+
+    const payload = JSON.parse(JSON.stringify(pjDraft));
+    // éviter de sauvegarder des champs UI inutiles
+    const entry = { id: pjDraft.id || uid(), name, payload };
+
+    if(pjDraft.id){
+      const idx = items.findIndex(x=>x.id===pjDraft.id);
+      if(idx >= 0) items[idx] = entry;
+      else items.unshift(entry);
+    }else{
+      pjDraft.id = entry.id;
+      items.unshift(entry);
+    }
+
+    localStorage.setItem(LS_PJ, JSON.stringify(items));
+    renderPjSaves();
+    renderPjExportPanel();
+    updatePjApplicableList();
+  }
+
+  function pjLoadById(id){
+    const items = JSON.parse(localStorage.getItem(LS_PJ) || '[]');
+    const found = items.find(x=>x.id===id);
+    if(!found) return;
+    const p = found.payload || {};
+    pjDraft = {
+      id: found.id,
+      code_pj: p.code_pj || "",
+      libelle: p.libelle || "",
+      desc: p.desc || "",
+      debut: p.debut || "",
+      fin: p.fin || "",
+      prio: Number(p.prio)||0,
+      depot: p.depot || { televersement:{required:false, blocking:false}, imposition:{required:false, blocking:false} },
+      criteria: p.criteria || {
+        CONTEXTE_INSCRIPTION:{operator:"Parmi", values:[]},
+        REGIME_INSCRIPTION:{operator:"Parmi", values:[]},
+        PROFIL:{operator:"Parmi", values:[]},
+        BOURSE:{operator:"Parmi", values:[]},
+        REGIME_SPECIAL_ETUDE:{operator:"Parmi", values:[]},
+        SITUATION_MILITAIRE:{operator:"Parmi", values:[]},
+        PIA:{operator:"Parmi", values:[]},
+        TYPE_DIPLOME:{operator:"Parmi", values:[]},
+        STRUCTURE_PRINCIPALE:{operator:"Parmi", values:[]},
+        AGE:{operator:"Parmi", values:[]},
+        TEMOIN_CVEC:{operator:"Parmi", values:[]}
+      }
+    };
+    renderPJ(); // recharge UI complète (simple)
+  }
+
+  function pjDeleteById(id){
+    const items = JSON.parse(localStorage.getItem(LS_PJ) || '[]');
+    const rest = items.filter(x=>x.id!==id);
+    localStorage.setItem(LS_PJ, JSON.stringify(rest));
+    // si on supprimait la règle ouverte
+    if(pjDraft.id === id) pjResetDraft();
+    renderPjSaves();
+    renderPjExportPanel();
+    updatePjApplicableList();
+  }
+
+  // UI helpers
+  function setToggle(elToggle, on){
+    if(!elToggle) return;
+    elToggle.classList.toggle('on', !!on);
+  }
+
+  function bindToggle(elToggle, getter, setter, onChange){
+    if(!elToggle) return;
+    setToggle(elToggle, getter());
+    elToggle.onclick = ()=>{
+      const next = !getter();
+      setter(next);
+      setToggle(elToggle, next);
+      onChange && onChange();
+    };
+  }
+
+  function renderPJ(){
+    const pane=document.getElementById('pane-pj'); 
+    pane.innerHTML='';
+
+    const header = el(`<div>
+      <div class="row" style="justify-content:space-between;margin-bottom:16px">
+        <div>
+          <div style="font-weight:700;font-size:20px">Pièces justificatives</div>
+          <div class="muted" style="margin-top:2px;font-size:12px">Paramétrage des règles d'exigibilité et de dépôt.</div>
+        </div>
+        <button class="btn" id="pjNewBtn">Nouvelle règle</button>
+      </div>
+      <div class="row" style="gap:12px;border-bottom:1px solid var(--border);padding-bottom:0">
+        <button class="pj-tab-btn active" data-pj-tab="config" style="padding:10px 16px;border:none;background:none;cursor:pointer;border-bottom:2px solid var(--primary);font-weight:600;color:var(--primary)">
+          📋 Paramétrage
+        </button>
+        <button class="pj-tab-btn" data-pj-tab="test" style="padding:10px 16px;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;font-weight:500;color:var(--muted)">
+          🧪 Test profil étudiant
+        </button>
+      </div>
+    </div>`);
+    pane.appendChild(header);
+
+    header.querySelector('#pjNewBtn').onclick = ()=>{ pjResetDraft(); renderPJ(); };
+
+    // Tab switching
+    header.querySelectorAll('.pj-tab-btn').forEach(btn => {
+      btn.onclick = () => {
+        // Update tabs
+        header.querySelectorAll('.pj-tab-btn').forEach(b => {
+          b.classList.remove('active');
+          b.style.borderBottomColor = 'transparent';
+          b.style.color = 'var(--muted)';
+          b.style.fontWeight = '500';
+        });
+        btn.classList.add('active');
+        btn.style.borderBottomColor = 'var(--primary)';
+        btn.style.color = 'var(--primary)';
+        btn.style.fontWeight = '600';
+
+        // Show/hide sections
+        const targetTab = btn.getAttribute('data-pj-tab');
+        document.getElementById('pj-section-config').classList.toggle('hidden', targetTab !== 'config');
+        document.getElementById('pj-section-test').classList.toggle('hidden', targetTab !== 'test');
+      };
+    });
+
+    // ========== SECTION 1: PARAMÉTRAGE DES CRITÈRES PJ ==========
+    const configSection = el(`<div id="pj-section-config" class="card"></div>`);
+    pane.appendChild(configSection);
+
+    const configContent = configSection;
+
+    // Règle PJ (form)
+    const ruleCard = el(`<div>
+      <div style="font-weight:600;font-size:16px;margin-bottom:12px">Informations de base</div>
+      <div class="grid2">
+        <div>
+          <label>Code PJ*</label>
+          <input id="code_pj" value="${(pjDraft.code_pj||'').replaceAll('"','&quot;')}">
+        </div>
+        <div>
+          <label>Libellé*</label>
+          <input id="libelle" value="${(pjDraft.libelle||'').replaceAll('"','&quot;')}">
+        </div>
+      </div>
+      <div style="height:8px"></div>
+      <label>Descriptif</label>
+      <textarea id="desc" rows="3">${(pjDraft.desc||'')}</textarea>
+      <div class="grid2" style="margin-top:8px">
+        <div>
+          <label>Début de validité*</label>
+          <input id="debut" type="date" value="${pjDraft.debut||''}">
+        </div>
+        <div>
+          <label>Fin de validité</label>
+          <input id="fin" type="date" value="${pjDraft.fin||''}">
+        </div>
+        <div>
+          <label>Priorité d'affichage*</label>
+          <input id="prio" type="number" value="${Number(pjDraft.prio)||0}">
+        </div>
+      </div>
+    </div>`);
+    configContent.appendChild(ruleCard);
+
+    ruleCard.querySelector('#code_pj').oninput = e=>pjDraft.code_pj=e.target.value;
+    ruleCard.querySelector('#libelle').oninput = e=>pjDraft.libelle=e.target.value;
+    ruleCard.querySelector('#desc').oninput = e=>pjDraft.desc=e.target.value;
+    ruleCard.querySelector('#debut').oninput = e=>pjDraft.debut=e.target.value;
+    ruleCard.querySelector('#fin').oninput = e=>pjDraft.fin=e.target.value;
+    ruleCard.querySelector('#prio').oninput = e=>pjDraft.prio=Number(e.target.value)||0;
+
+    // Critères d'exigibilité
+    const blocCrit = el(`<div style="margin-top:24px;padding-top:24px;border-top:1px solid var(--border)">
+      <div style="font-weight:600;font-size:16px;margin-bottom:12px">Critères d'exigibilité</div>
+      <div id="critHost"></div>
+    </div>`);
+    configContent.appendChild(blocCrit);
+
+    function addCritRowPJ(label, key, options){
+      const crit = pjDraft.criteria[key];
+      const row = el(`<div class="row4" style="margin-top:8px">
+        <div style="align-self:center;font-weight:600;font-size:14px">${label}</div>
+        <div>
+          <select class="op">
+            ${OPS_PJ.map(o=>`<option ${o===crit.operator?'selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div data-multi></div>
+      </div>`);
+      blocCrit.querySelector('#critHost').appendChild(row);
+
+      const multiHost=row.querySelector('[data-multi]');
+      const multi=createMulti({
+        options,
+        selected:(crit.values||[]).slice(),
+        onChange:(vals)=>{ crit.values = vals; updatePjApplicableList(); },
+        placeholder:"(Tous)"
+      });
+      multiHost.appendChild(multi.root);
+
+      row.querySelector('.op').onchange = (e)=>{ crit.operator=e.target.value; updatePjApplicableList(); };
+    }
+
+    addCritRowPJ("Contexte d'inscription","CONTEXTE_INSCRIPTION",DEFAULT_PJ.CONTEXTE_INSCRIPTION);
+    addCritRowPJ("Régime d'inscription","REGIME_INSCRIPTION",DEFAULT_PJ.REGIME_INSCRIPTION);
+    addCritRowPJ("Profil","PROFIL",DEFAULT_PJ.PROFIL);
+    addCritRowPJ("Bourse","BOURSE",DEFAULT_PJ.BOURSE);
+    addCritRowPJ("Régime spécial d'étude","REGIME_SPECIAL_ETUDE",DEFAULT_PJ.REGIME_SPECIAL_ETUDE);
+    addCritRowPJ("Situation militaire","SITUATION_MILITAIRE",DEFAULT_PJ.SITUATION_MILITAIRE);
+    addCritRowPJ("PIA","PIA",DEFAULT_PJ.PIA);
+    addCritRowPJ("Type de diplôme","TYPE_DIPLOME",DEFAULT_PJ.TYPE_DIPLOME);
+    addCritRowPJ("Structure principale","STRUCTURE_PRINCIPALE",DEFAULT_PJ.STRUCTURE_PRINCIPALE);
+    addCritRowPJ("Age","AGE",DEFAULT_PJ.AGE);
+    addCritRowPJ("Témoin CVEC","TEMOIN_CVEC",DEFAULT_PJ.TEMOIN_CVEC);
+
+    // Paramètres de dépôt (dans la section config)
+    const paramsDepo = el(`<div style="margin-top:24px;padding-top:24px;border-top:1px solid var(--border)">
+      <div style="font-weight:600;font-size:16px;margin-bottom:12px">Paramètres du dépôt de la pièce justificative</div>
+
+      <div class="grid3">
+        <div>
+          <label>Téléversement</label>
+          <div class="row" style="justify-content:space-between">
+            <span class="muted" style="font-size:12px">Permet de faire le dépôt en ligne</span>
+            <div class="toggle" id="teleToggle"><span></span></div>
+          </div>
+        </div>
+
+        <div>
+          <label>Pièce à fournir bloquante</label>
+          <div class="row" style="justify-content:space-between">
+            <span class="muted" style="font-size:12px">Empêche l'étudiant de continuer</span>
+            <div class="toggle" id="bloqToggle"><span></span></div>
+          </div>
+        </div>
+
+        <div>
+          <label>Validation gestionnaire</label>
+          <div class="row" style="justify-content:space-between">
+            <span class="muted" style="font-size:12px">Étape de validation nécessaire</span>
+            <div class="toggle" id="validToggle"><span></span></div>
+          </div>
+        </div>
+      </div>
+    </div>`);
+    configContent.appendChild(paramsDepo);
+
+    // Bind dépôt toggles (draft)
+    bindToggle(
+      paramsDepo.querySelector('#teleToggle'),
+      ()=>pjDraft.depot.televersement,
+      (v)=>{pjDraft.depot.televersement=v;},
+      ()=>{ updatePjApplicableList(); }
+    );
+    bindToggle(
+      paramsDepo.querySelector('#bloqToggle'),
+      ()=>pjDraft.depot.bloquante,
+      (v)=>{pjDraft.depot.bloquante=v;},
+      ()=>{ updatePjApplicableList(); }
+    );
+    bindToggle(
+      paramsDepo.querySelector('#validToggle'),
+      ()=>pjDraft.depot.validation_gestionnaire,
+      (v)=>{pjDraft.depot.validation_gestionnaire=v;},
+      ()=>{ updatePjApplicableList(); }
+    );
+
+    // Bouton Sauvegarder (après les toggles)
+    const saveButtonRow = el(`<div style="margin-top:24px;text-align:right">
+      <button class="btn primary" id="pjSaveBtn">Sauvegarder</button>
+    </div>`);
+    configContent.appendChild(saveButtonRow);
+    saveButtonRow.querySelector('#pjSaveBtn').onclick = ()=>{ pjSaveDraft(); };
+
+    // Règles enregistrées (dans l'onglet Paramétrage, format card)
+    const savesCard = el(`<details class="card" style="margin-top:20px">
+      <summary><div class="title">Règles enregistrées</div></summary>
+      <div class="details-content" id="pjList"></div>
+    </details>`);
+    configContent.appendChild(savesCard);
+    renderPjSaves();
+
+    // Export / Import (dans l'onglet Paramétrage, format card)
+    const exportCard = el(`<details class="card" style="margin-top:20px">
+      <summary><div class="title">Export / Import sélectif des PJ</div></summary>
+      <div class="details-content">
+        <div>
+          <div style="font-weight:600;margin-bottom:6px">Sélection PJ</div>
+          <div id="export-pj-list"></div>
+          <div class="row" style="margin-top:10px">
+            <button class="btn" id="pj-export-selected">Exporter sélection</button>
+            <button class="btn" id="pj-export-all">Exporter tout</button>
+          </div>
+          <div class="mt-2 muted" style="font-size:12px">
+            <strong>Export sélectif :</strong> Pour partager uniquement certaines règles PJ avec un collègue.<br>
+            <em>Pour un backup complet (EDR+Tarifs+PJ), voir l'onglet Options.</em>
+          </div>
+        </div>
+        <div class="mt-4" style="border-top:1px dashed #e5e7eb;padding-top:14px">
+          <div style="font-weight:600;margin-bottom:6px">Import de configurations PJ</div>
+          <div class="row">
+            <input type="file" id="pj-import-file" accept="application/json">
+            <span class="muted" style="font-size:12px">Fichiers d'export PJ uniquement.</span>
+          </div>
+        </div>
+      </div>
+    </details>`);
+    configContent.appendChild(exportCard);
+    renderPjExportPanel();
+
+    // ========== SECTION 2: TEST AVEC PROFIL ÉTUDIANT ==========
+    const testSection = el(`<div id="pj-section-test" class="card hidden"></div>`);
+    pane.appendChild(testSection);
+
+    const testContent = testSection;
+
+    // Profil étudiant de test
+    const profilCard = el(`<div>
+      <div style="font-weight:600;font-size:16px;margin-bottom:12px">Critères du profil étudiant</div>
+
+      <div class="grid2">
+        <div>
+          <label>Contexte d'inscription</label>
+          <select id="pj-st-CONTEXTE_INSCRIPTION">
+            ${DEFAULT_PJ.CONTEXTE_INSCRIPTION.map(o=>`<option ${o===pjTestProfile.CONTEXTE_INSCRIPTION?'selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label>Régime d'inscription</label>
+          <select id="pj-st-REGIME_INSCRIPTION">
+            ${DEFAULT_PJ.REGIME_INSCRIPTION.map(o=>`<option ${o===pjTestProfile.REGIME_INSCRIPTION?'selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label>Profil</label>
+          <select id="pj-st-PROFIL">
+            ${DEFAULT_PJ.PROFIL.map(o=>`<option ${o===pjTestProfile.PROFIL?'selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label>Bourse</label>
+          <select id="pj-st-BOURSE">
+            ${DEFAULT_PJ.BOURSE.map(o=>`<option ${o===pjTestProfile.BOURSE?'selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label>Régime spécial d'étude</label>
+          <select id="pj-st-REGIME_SPECIAL_ETUDE">
+            ${DEFAULT_PJ.REGIME_SPECIAL_ETUDE.map(o=>`<option ${o===pjTestProfile.REGIME_SPECIAL_ETUDE?'selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label>Situation militaire</label>
+          <select id="pj-st-SITUATION_MILITAIRE">
+            ${DEFAULT_PJ.SITUATION_MILITAIRE.map(o=>`<option ${o===pjTestProfile.SITUATION_MILITAIRE?'selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label>PIA</label>
+          <select id="pj-st-PIA">
+            ${DEFAULT_PJ.PIA.map(o=>`<option ${o===pjTestProfile.PIA?'selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label>Type de diplôme</label>
+          <select id="pj-st-TYPE_DIPLOME">
+            ${DEFAULT_PJ.TYPE_DIPLOME.map(o=>`<option ${o===pjTestProfile.TYPE_DIPLOME?'selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label>Structure principale</label>
+          <select id="pj-st-STRUCTURE_PRINCIPALE">
+            ${DEFAULT_PJ.STRUCTURE_PRINCIPALE.map(o=>`<option ${o===pjTestProfile.STRUCTURE_PRINCIPALE?'selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label>Age</label>
+          <select id="pj-st-AGE">
+            ${DEFAULT_PJ.AGE.map(o=>`<option ${o===pjTestProfile.AGE?'selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label>Témoin CVEC</label>
+          <select id="pj-st-TEMOIN_CVEC">
+            ${DEFAULT_PJ.TEMOIN_CVEC.map(o=>`<option ${o===pjTestProfile.TEMOIN_CVEC?'selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+
+      <div class="mt-2 muted" style="font-size:12px">
+        Modifier ces champs pour voir les PJ applicables selon le profil étudiant.
+      </div>
+    </div>`);
+    testContent.appendChild(profilCard);
+
+    // Bind selects
+    PJ_KEYS.forEach(k=>{
+      const sel = profilCard.querySelector(`#pj-st-${k}`);
+      if(sel){
+        sel.onchange = (e)=>{ pjTestProfile[k]=e.target.value; updatePjApplicableList(); };
+      }
+    });
+
+    // Résultats des PJ applicables
+    const resultsCard = el(`<div style="margin-top:24px;padding-top:24px;border-top:1px solid var(--border)">
+      <div style="font-weight:600;font-size:16px;margin-bottom:12px">PJ applicables (selon le profil étudiant)</div>
+      <div id="pj-applicable-list"></div>
+    </div>`);
+    testContent.appendChild(resultsCard);
+
+    // Init list
+    updatePjApplicableList();
+  }
+
+  function updatePjApplicableList(){
+    const host = document.getElementById('pj-applicable-list');
+    if(!host) return;
+
+    const items = JSON.parse(localStorage.getItem(LS_PJ)||'[]');
+
+    const applicable = items.filter(it=>{
+      const p = it.payload || {};
+      return pjRuleApplies(p, pjTestProfile);
+    }).sort((a,b)=>{
+      const pa = Number((a.payload||{}).prio)||0;
+      const pb = Number((b.payload||{}).prio)||0;
+      return pa - pb;
+    });
+
+    if(!applicable.length){
+      host.innerHTML = `<div class="muted">Aucune PJ applicable pour ce profil.</div>`;
+      return;
+    }
+
+    const rows = applicable.map(it=>{
+      const p = it.payload || {};
+      const depot = p.depot || {};
+      const isDeposited = !!pjStudentDeposits[it.id];
+      
+      // Déterminer les badges et icônes
+      const isBloquante = depot.bloquante;
+      const needsValidation = depot.validation_gestionnaire;
+      const allowsDeposit = depot.televersement;
+      
+      const obligatoireIcon = isBloquante ? '⚠️' : '';
+      const validationMsg = needsValidation ? '<div class="muted" style="font-size:11px;margin-top:4px">⚙️ Validation gestionnaire nécessaire</div>' : '';
+      
+      return `
+        <div class="card" style="padding:12px;margin-top:8px" data-pj-id="${it.id}">
+          <div class="row" style="justify-content:space-between;align-items:start">
+            <div style="flex:1">
+              <div style="font-weight:600">${obligatoireIcon} ${(p.code_pj||'')} — ${(p.libelle||it.name||'')}</div>
+              <div class="muted" style="font-size:12px">Priorité: ${Number(p.prio)||0}</div>
+              ${isBloquante ? '<span class="badge red" style="margin-top:4px">Pièce bloquante</span>' : ''}
+              ${validationMsg}
+            </div>
+            <div class="row" style="gap:12px;align-items:center">
+              ${allowsDeposit ? `
+                <div class="row" style="align-items:center;gap:6px">
+                  <span style="font-size:13px;color:${isDeposited?'#16a34a':'#6b7280'}">${isDeposited?'Déposé':'Non déposé'}</span>
+                  <div class="toggle ${isDeposited?'on':''}" data-toggle-deposit="${it.id}"><span></span></div>
+                </div>
+              ` : '<span class="muted" style="font-size:12px">Pas de dépôt en ligne</span>'}
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    host.innerHTML = rows;
+
+    // Bind toggles de dépôt
+    host.querySelectorAll('[data-toggle-deposit]').forEach(toggle=>{
+      const pjId = toggle.getAttribute('data-toggle-deposit');
+      toggle.onclick = ()=>{
+        pjStudentDeposits[pjId] = !pjStudentDeposits[pjId];
+        updatePjApplicableList();
+        validateCanTest();
+      };
+    });
+    
+    validateCanTest();
+  }
+  
+  function validateCanTest(){
+    // Vérifier que toutes les PJ bloquantes sont déposées
+    const items = JSON.parse(localStorage.getItem(LS_PJ)||'[]');
+    const applicable = items.filter(it=>{
+      const p = it.payload || {};
+      return pjRuleApplies(p, pjTestProfile);
+    });
+    
+    const missingBlocking = applicable.filter(it=>{
+      const depot = (it.payload || {}).depot || {};
+      return depot.bloquante && depot.televersement && !pjStudentDeposits[it.id];
+    });
+    
+    // On pourrait afficher un message ou désactiver un bouton selon les besoins
+    // Pour l'instant on affiche juste un indicateur
+    const host = document.getElementById('pj-applicable-list');
+    if(host && missingBlocking.length > 0){
+      const warning = document.getElementById('pj-blocking-warning');
+      if(!warning){
+        const msg = el(`<div id="pj-blocking-warning" class="card" style="background:#fee2e2;border-color:#fca5a5;padding:10px;margin-top:12px">
+          <div style="font-weight:600;color:#b91c1c">⚠️ Attention</div>
+          <div class="muted" style="font-size:12px;color:#7f1d1d">Des pièces bloquantes ne sont pas déposées. L'étudiant ne pourrait pas continuer.</div>
+        </div>`);
+        host.parentElement.insertBefore(msg, host.nextSibling);
+      }
+    } else {
+      const warning = document.getElementById('pj-blocking-warning');
+      if(warning) warning.remove();
+    }
+  }
+
+  /* ======== UI OPTIONS ======== */
+  function renderOptions(){
+    const pane=document.getElementById('pane-options'); 
+    pane.innerHTML='';
+
+    const header = el(`<div>
+      <div style="font-weight:700;font-size:20px">Options</div>
+      <div class="muted" style="margin-top:2px;font-size:12px">Paramètres généraux et sauvegarde.</div>
+    </div>`);
+    pane.appendChild(header);
+
+    // Backup complet section
+    const backupCard = el(`<details class="card" open>
+      <summary>
+        <div class="title">💾 Backup complet (EDR + Tarifs + PJ)</div>
+      </summary>
+      <div class="details-content">
+        <div>
+          <div style="font-weight:600;margin-bottom:6px">Sauvegarde complète</div>
+          <button class="btn primary" id="global-backup" style="margin-bottom:10px;width:100%">📤 Créer un backup complet</button>
+          <div class="muted" style="font-size:12px;margin-bottom:12px">
+            Exporte <strong>toutes</strong> les données (EDR, Tarifs, PJ) en un seul fichier.<br>
+            <strong>Usage :</strong> Changement de dossier, partage complet avec collègues, sauvegarde de sécurité.
+          </div>
+        </div>
+        <div class="mt-4" style="border-top:1px dashed #e5e7eb;padding-top:14px">
+          <div style="font-weight:600;margin-bottom:6px">Restaurer un backup complet</div>
+          <button class="btn" id="global-restore" style="margin-bottom:10px;width:100%">📥 Restaurer un backup</button>
+          <input type="file" id="global-restore-file" accept="application/json" style="display:none">
+          <div class="muted" style="font-size:12px">
+            ⚠️ <strong>Attention :</strong> Cela remplacera toutes vos données actuelles par celles du backup.
+          </div>
+        </div>
+      </div>
+    </details>`);
+    pane.appendChild(backupCard);
+  }
+
+  function renderPjSaves(){
+    const list=document.getElementById('pjList'); 
+    if(!list) return;
+
+    const items=JSON.parse(localStorage.getItem(LS_PJ)||'[]');
+    if(!items.length){
+      list.innerHTML = '<div class="muted">Aucune règle enregistrée.</div>';
+      return;
+    }
+
+    list.innerHTML = `
+      <div>
+        <label>Sélectionner une règle PJ</label>
+        <select id="pjSelect" style="margin-bottom:10px">
+          <option value="">(Choisir une règle PJ)</option>
+          ${items.map(t=>`<option value="${t.id}">${t.name}</option>`).join('')}
+        </select>
+      </div>
+      <div class="row">
+        <button class="btn primary" id="pjLoadBtn" disabled>Charger</button>
+        <button class="btn danger" id="pjDelBtn" disabled>Supprimer</button>
+      </div>
+    `;
+
+    const select = list.querySelector('#pjSelect');
+    const loadBtn = list.querySelector('#pjLoadBtn');
+    const delBtn = list.querySelector('#pjDelBtn');
+
+    select.onchange = ()=>{
+      const ok = !!select.value;
+      loadBtn.disabled = !ok;
+      delBtn.disabled = !ok;
+    };
+
+    loadBtn.onclick = ()=>{ if(!select.value) return; pjLoadById(select.value); };
+
+    delBtn.onclick = ()=>{
+      const selectedId = select.value;
+      if(!selectedId) return;
+      if(!confirm('Êtes-vous sûr de vouloir supprimer cette règle PJ ?')) return;
+      pjDeleteById(selectedId);
+    };
+  }
+
+  function renderPjExportPanel(){
+    const host=document.getElementById('export-pj-list'); if(!host) return;
+    const items=JSON.parse(localStorage.getItem(LS_PJ)||'[]');
+    if(!items.length){
+      host.innerHTML = '<div class="muted">Aucune règle PJ.</div>';
+      return;
+    }
+    
+    // Create multi-select dropdown
+    const container = document.createElement('div');
+    const label = document.createElement('label');
+    label.textContent = 'Sélectionner une ou plusieurs règles PJ';
+    label.style.display = 'block';
+    label.style.marginBottom = '6px';
+    
+    let selectedIds = [];
+    const multiSelect = createMulti({
+      options: items.map(it => it.name),
+      selected: [],
+      onChange: (selected) => {
+        // Map names back to IDs
+        selectedIds = selected.map(name => {
+          const item = items.find(it => it.name === name);
+          return item ? item.id : null;
+        }).filter(Boolean);
+      },
+      placeholder: '(Sélectionner des règles PJ)'
+    });
+    
+    container.appendChild(label);
+    container.appendChild(multiSelect.root);
+    host.innerHTML = '';
+    host.appendChild(container);
+    
+    const btnSel=document.getElementById('pj-export-selected');
+    const btnAll=document.getElementById('pj-export-all');
+    const file=document.getElementById('pj-import-file');
+    
+    if(btnSel){
+      btnSel.onclick=async ()=>{
+        if(!selectedIds.length) {
+          alert('⚠️ Veuillez sélectionner au moins une règle PJ à exporter.');
+          return;
+        }
+        const selectedItems = items.filter(x=>selectedIds.includes(x.id));
+        const content = JSON.stringify(selectedItems, null, 2);
+        
+        const filename = selectedItems.length === 1 
+          ? `pj-${sanitizeFilename(selectedItems[0].name)}-${new Date().toISOString().slice(0,10)}.json`
+          : `pj-export-${selectedItems.length}-items-${new Date().toISOString().slice(0,10)}.json`;
+        
+        const saved = await saveFileWithPicker(content, filename);
+        
+        // Fallback to automatic download if API not supported
+        if (saved === null) {
+          alert('ℹ️ Votre navigateur ne supporte pas la sélection de dossier.\n\nLe fichier sera téléchargé dans votre dossier de téléchargements par défaut.');
+          const blob = new Blob([content], {type:"application/json"});
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url; 
+          a.download = filename;
+          document.body.appendChild(a); 
+          a.click(); 
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        } else if (saved === true) {
+          alert('✅ Fichier enregistré avec succès !');
+        }
+        // If saved === false, user cancelled, no message needed
+      };
+    }
+    if(btnAll){btnAll.onclick=()=>exportAll(LS_PJ,'pj');}
+    if(file){file.onchange=e=>importFromFile(e.target,LS_PJ,()=>{renderPjSaves();renderPjExportPanel();});}
+  }
+
+  // Initial render
+  renderEDR();
+  renderTarif();
+  renderPJ();
+  renderOptions();
+  
+  // Setup global backup/restore buttons
+  document.getElementById('global-backup').onclick = globalBackup;
+  document.getElementById('global-restore').onclick = ()=>{
+    document.getElementById('global-restore-file').click();
+  };
+  document.getElementById('global-restore-file').onchange = (e)=>{
+    if(e.target.files && e.target.files[0]){
+      globalRestore(e.target.files[0]);
+      e.target.value = '';
+    }
+  };
+})();
+</script>
+</body>
+</html>
